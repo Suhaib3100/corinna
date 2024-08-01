@@ -1,3 +1,4 @@
+'use client'
 import {
   onGetChatMessages,
   onGetDomainChatRooms,
@@ -12,9 +13,10 @@ import {
   ConversationSearchSchema,
 } from '@/schemas/conversation.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
+// Custom Hook: useConversation
 export const useConversation = () => {
   const { register, watch } = useForm({
     resolver: zodResolver(ConversationSearchSchema),
@@ -36,21 +38,29 @@ export const useConversation = () => {
     }[]
   >([])
   const [loading, setLoading] = useState<boolean>(false)
-  useEffect(() => {
-    const search = watch(async (value) => {
-      setLoading(true)
-      try {
-        const rooms = await onGetDomainChatRooms(value.domain)
-        if (rooms) {
-          setLoading(false)
-          setChatRooms(rooms.customer)
-        }
-      } catch (error) {
-        console.log(error)
+
+  // Memoized callback for search
+  const handleWatch = useCallback(async (value: any) => {
+    setLoading(true)
+    try {
+      const rooms = await onGetDomainChatRooms(value.domain)
+      if (rooms) {
+        setLoading(false)
+        setChatRooms(rooms.customer)
       }
-    })
-    return () => search.unsubscribe()
-  }, [watch])
+    } catch (error) {
+      console.log(error)
+      setLoading(false)
+    }
+  }, [setChatRooms])
+
+  useEffect(() => {
+    const subscription = watch(handleWatch)
+    return () => {
+      // Clean up watch subscription
+      subscription.unsubscribe?.()
+    }
+  }, [watch, handleWatch])
 
   const onGetActiveChatMessages = async (id: string) => {
     try {
@@ -65,6 +75,7 @@ export const useConversation = () => {
       console.log(error)
     }
   }
+
   return {
     register,
     chatRooms,
@@ -73,6 +84,7 @@ export const useConversation = () => {
   }
 }
 
+// Custom Hook: useChatTime
 export const useChatTime = (createdAt: Date, roomId: string) => {
   const { chatRoom } = useChatContext()
   const [messageSentAt, setMessageSentAt] = useState<string>()
@@ -98,24 +110,25 @@ export const useChatTime = (createdAt: Date, roomId: string) => {
     }
   }
 
-  const onSeenChat = async () => {
+  const onSeenChat = useCallback(async () => {
     if (chatRoom == roomId && urgent) {
       await onViewUnReadMessages(roomId)
       setUrgent(false)
     }
-  }
+  }, [chatRoom, roomId, urgent])
 
   useEffect(() => {
     onSeenChat()
-  }, [chatRoom])
+  }, [onSeenChat])
 
   useEffect(() => {
     onSetMessageRecievedDate()
-  }, [])
+  }, [createdAt])
 
   return { messageSentAt, urgent, onSeenChat }
 }
 
+// Custom Hook: useChatWindow
 export const useChatWindow = () => {
   const { chats, loading, setChats, chatRoom } = useChatContext()
   const messageWindowRef = useRef<HTMLDivElement | null>(null)
@@ -123,6 +136,7 @@ export const useChatWindow = () => {
     resolver: zodResolver(ChatBotMessageSchema),
     mode: 'onChange',
   })
+
   const onScrollToBottom = () => {
     messageWindowRef.current?.scroll({
       top: messageWindowRef.current.scrollHeight,
@@ -133,7 +147,7 @@ export const useChatWindow = () => {
 
   useEffect(() => {
     onScrollToBottom()
-  }, [chats, messageWindowRef])
+  }, [chats])
 
   useEffect(() => {
     if (chatRoom) {
@@ -147,7 +161,7 @@ export const useChatWindow = () => {
         pusherClient.unsubscribe(chatRoom)
       }
     }
-  }, [chatRoom])
+  }, [chatRoom, setChats])
 
   const onHandleSentMessage = handleSubmit(async (values) => {
     try {
@@ -157,11 +171,7 @@ export const useChatWindow = () => {
         values.content,
         'assistant'
       )
-      //WIP: Remove this line
       if (message) {
-        //remove this
-        // setChats((prev) => [...prev, message.message[0]])
-
         await onRealTimeChat(
           chatRoom!,
           message.message[0].message,

@@ -173,7 +173,7 @@ import {
   
     useEffect(() => {
       onGetCustomerAnswers()
-    }, [])
+    }, [onGetCustomerAnswers])
   
     return { answers, loading }
   }
@@ -197,7 +197,7 @@ import {
   
     useEffect(() => {
       onGetTemplate(id)
-    }, [])
+    }, [id])
   
     return { loading, template }
   }

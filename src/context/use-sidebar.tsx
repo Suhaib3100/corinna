@@ -1,8 +1,7 @@
 'use client'
 import { useToast } from '@/components/ui/use-toast'
 import { usePathname, useRouter } from 'next/navigation'
-import React from 'react'
-import { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useClerk } from '@clerk/nextjs'
 import { useChatContext } from './use-chat-context'
 import { onGetConversationMode, onToggleRealtime } from '@/actions/conversation'
@@ -15,6 +14,7 @@ const useSideBar = () => {
     const [realtime, setRealtime] = useState<boolean>(false)
     const [loading, setLoading] = useState<boolean>(false)
     const { chatRoom } = useChatContext()
+    
     const onActivateRealtime = async (e: any) => {
         try {
           const realtime = await onToggleRealtime(
@@ -32,25 +32,27 @@ const useSideBar = () => {
           console.log(error)
         }
       }
-      const onGetCurrentMode = async () => {
+      
+    const onGetCurrentMode = useCallback(async () => {
         setLoading(true)
         const mode = await onGetConversationMode(chatRoom!)
         if (mode) {
           setRealtime(mode.live)
           setLoading(false)
         }
-      }
+    }, [chatRoom])
     
-      useEffect(() => {
+    useEffect(() => {
         if (chatRoom) {
           onGetCurrentMode()
         }
-      }, [chatRoom])
-      const page = pathname.split('/').pop()
-      const { signOut } = useClerk()
-      const onSignOut = () => signOut(() => router.push('/'))
+    }, [chatRoom, onGetCurrentMode])
+    
+    const page = pathname.split('/').pop()
+    const { signOut } = useClerk()
+    const onSignOut = () => signOut(() => router.push('/'))
 
-      const onExpand = () => setExpand((prev) => !prev)
+    const onExpand = () => setExpand((prev) => !prev)
     
     return {
         expand,
@@ -61,7 +63,7 @@ const useSideBar = () => {
         onActivateRealtime,
         chatRoom,
         loading,
-      
-      }
+    }
 }
+
 export default useSideBar

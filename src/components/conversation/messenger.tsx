@@ -34,7 +34,8 @@ const Messenger = (props: Props) => {
                   message={{
                     role: chat.role!,
                     content: chat.message,
-                    link: chat.link, // Make sure to pass the link if available
+                    // Remove link if it shouldn't be part of the chat object
+                    // link: chat.link, 
                   }}
                   createdAt={chat.createdAt}
                 />

@@ -1,11 +1,9 @@
-import { cn } from '@/lib/utils'
-import React from 'react'
+// src/components/spinner.tsx
+import React from 'react';
+import { cn } from '@/lib/utils';
+import { DynamicOptionsLoadingProps } from '@/types';
 
-type SpinnerProps = {
-  noPadding?: boolean
-}
-
-export const Spinner = ({ noPadding }: SpinnerProps) => {
+export const Spinner: React.FC<DynamicOptionsLoadingProps> = ({ noPadding }) => {
   return (
     <div className={cn('w-full flex justify-center', noPadding ? '' : 'py-10')}>
       <div role="status">
@@ -28,5 +26,5 @@ export const Spinner = ({ noPadding }: SpinnerProps) => {
         <span className="sr-only">Loading...</span>
       </div>
     </div>
-  )
-}
+  );
+};

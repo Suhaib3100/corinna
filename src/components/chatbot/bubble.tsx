@@ -1,3 +1,4 @@
+
 import React from 'react'
 import { cn, extractUUIDFromString, getMonthName } from '@/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
@@ -9,8 +10,7 @@ type Props = {
   message: {
     role: 'assistant' | 'user'
     content: string
-    link?: string
-  }
+    link?: string;   }
   createdAt?: Date
 }
 

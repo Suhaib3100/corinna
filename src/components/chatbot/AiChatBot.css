@@ -1,0 +1,92 @@
+/* AiChatBot.css */
+
+.chatbot-container {
+  position: relative;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-end;
+  gap: 1rem;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.chatbot-button {
+  position: relative;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #007bff;
+  border-radius: 50%;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.chatbot-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+}
+
+.bot-icon {
+  width: 24px;
+  height: 24px;
+  fill: white; /* Ensure the icon stands out against the button */
+}
+
+.arrow-container {
+  position: absolute;
+  bottom: 100%; /* Position above the icon */
+  right: 50%;
+  transform: translateX(50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: slide-up 0.5s ease-in-out;
+}
+
+.arrow {
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid #007bff;
+  margin-top: 5px;
+}
+
+@keyframes slide-up {
+  0% {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .chatbot-container {
+    padding: 0.5rem;
+    gap: 0.5rem;
+  }
+
+  .chatbot-button {
+    width: 50px;
+    height: 50px;
+  }
+
+  .bot-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .arrow {
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid #007bff;
+  }
+}
